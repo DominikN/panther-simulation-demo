@@ -4,7 +4,6 @@ services:
   # ROS Galactic simulation
   panther_gazebo:
     image: husarion/panther-gazebo:galactic-latest
-    tty: true
     runtime: nvidia
     environment:
       - "DISPLAY"
@@ -16,6 +15,19 @@ services:
     command: >
       ros2 launch panther_gazebo panther.launch.py 
       use_gpu:=true
+    # command: sleep 3600
+
+  rviz:
+    image: husarion/rviz2
+    restart: unless-stopped
+    runtime: nvidia
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./panther.rviz:/root/.rviz2/default.rviz
+    environment:
+      - DISPLAY
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
 
   # ROS Galactic Navigation 2
   nav2:
@@ -27,9 +39,4 @@ services:
     volumes:
       - ./config/nav2_params.yaml:/app/ros2_ws/src/husarion_nav2/config/nav2_params.yaml
       - ./config/slam_toolbox.yaml:/app/ros2_ws/src/husarion_nav2/config/slam_toolbox.yaml
-    command: 
-      - sh
-      - -c
-      - |
-        sleep 5
-        ros2 launch husarion_nav2 bringup_both.launch.py
+    command: ros2 launch husarion_nav2 bringup_both.launch.py
