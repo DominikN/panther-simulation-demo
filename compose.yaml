@@ -32,7 +32,6 @@ services:
   # ROS Galactic Navigation 2
   nav2:
     image: husarion/nav2:galactic-latest
-    tty: true
     restart: on-failure
     depends_on:
       - panther_gazebo
