@@ -33,16 +33,16 @@ services:
     build: .
     command: ros2 run demo_nodes_cpp listener
 
-  # rviz:
-  #   image: husarion/rviz2
-  #   runtime: nvidia
-  #   volumes: 
-  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  #     - ./rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
-  #   environment:
-  #     - DISPLAY
-  #     - NVIDIA_VISIBLE_DEVICES=all
-  #     - NVIDIA_DRIVER_CAPABILITIES=all
+  rviz:
+    image: husarion/rviz2
+    runtime: nvidia
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
+    environment:
+      - DISPLAY
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
 
 # Needed if running all compose.*.yaml files on the same host. Thanks to those lines a new subnet for this compose file is created
 networks:

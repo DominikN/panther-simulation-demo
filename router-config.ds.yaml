@@ -1,25 +1,22 @@
-# Configuration for a host running a Fast DDS Discovery Server.
-#
-# 1. It allows service discovery for two other hosts (talker, listener) 
-#    in this demo.
-# 2. Only the service discovery phase is centralized. After that, ROS 2 
-#    nodes communicate p2p.
-# 3. You can log messages from a "/chatter" topic using "echo" participant.
-#    It is not required however for communication:
-#    host-talker --> [/chatter1] --> host-listener
-###########################################################################
-
 allowlist:
-  # - name: "rt/odom"
-  #   type: "nav_msgs::msg::dds_::Odometry_"
-  # - name: "rt/rosout"
-  #   type: "rcl_interfaces::msg::dds_::Log_"
-  # - name: "rt/scan"
-  #   type: "sensor_msgs::msg::dds_::LaserScan_"
-  # - name: "rt/tf"
-  #   type: "tf2_msgs::msg::dds_::TFMessage_"
   - name: "rt/chatter"
     type: "std_msgs::msg::dds_::String_"
+  - name: "rt/odom"
+    type: "nav_msgs::msg::dds_::Odometry_"
+  - name: "rt/rosout"
+    type: "rcl_interfaces::msg::dds_::Log_"
+  - name: "rt/scan"
+    type: "sensor_msgs::msg::dds_::LaserScan_"
+  - name: "rt/tf"
+    type: "tf2_msgs::msg::dds_::TFMessage_"
+  - name: "rt/map"
+    type: "nav_msgs::msg::dds_::OccupancyGrid_"
+  - name: "rt/map_metadata"
+    type: "nav_msgs::msg::dds_::MapMetaData_"
+  - name: "rt/laser/scan"
+    type: "sensor_msgs::msg::dds_::LaserScan_"
+  - name: "rt/goal_pose"
+    type: "geometry_msgs::msg::dds_::PoseStamped_"
 
 echo_participant:
   type: echo
