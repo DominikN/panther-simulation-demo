@@ -27,10 +27,10 @@ services:
     environment:
       - DS_HOSTNAME=ds
     # command: sleep 3600
-    command: bash -c "/wait_ds.sh && ddsrouter -c /config.yaml -r 10"
+    command: bash -c "wait_ds.sh && ddsrouter -c /config.yaml -r 10"
 
   talker:
-    build: .
+    build: ../
     command: ros2 run demo_nodes_cpp talker
 
   # ROS Galactic simulation
@@ -51,8 +51,8 @@ services:
   nav2:
     image: husarion/nav2:galactic-latest
     volumes:
-      - ./nav2_config/nav2_params.yaml:/app/ros2_ws/src/husarion_nav2/config/nav2_params.yaml
-      - ./nav2_config/slam_toolbox.yaml:/app/ros2_ws/src/husarion_nav2/config/slam_toolbox.yaml
+      - ../nav2_config/nav2_params.yaml:/app/ros2_ws/src/husarion_nav2/config/nav2_params.yaml
+      - ../nav2_config/slam_toolbox.yaml:/app/ros2_ws/src/husarion_nav2/config/slam_toolbox.yaml
     command: ros2 launch husarion_nav2 bringup_both.launch.py
 
 # Needed if running all compose.*.yaml files on the same host. Thanks to those lines a new subnet for this compose file is created

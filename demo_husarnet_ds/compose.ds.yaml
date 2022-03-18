@@ -13,7 +13,7 @@ services:
       - ./router-config.ds.yaml:/config.yaml
     environment:
       - DS_HOSTNAME=ds
-    command: bash -c "/wait_ds.sh && ddsrouter -c /config.yaml -r 10"
+    command: bash -c "wait_ds.sh && ddsrouter -c /config.yaml -r 10"
     # command: ddsrouter -c /config.yaml -r 10    # will work as well, but the Docker Compose log at startup will be ugly while waiting for `dds-discovery-server` host
 
   husarnet_ds:

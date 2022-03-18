@@ -27,10 +27,10 @@ services:
     environment:
       - DS_HOSTNAME=ds
     # command: sleep 3600
-    command: bash -c "/wait_ds.sh && ddsrouter -c /config.yaml -r 10"
+    command: bash -c "wait_ds.sh && ddsrouter -c /config.yaml -r 10"
 
   listener:
-    build: .
+    build: ../
     command: ros2 run demo_nodes_cpp listener
 
   rviz:
@@ -38,7 +38,7 @@ services:
     runtime: nvidia
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ./rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
+      - ../rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
     environment:
       - DISPLAY
       - NVIDIA_VISIBLE_DEVICES=all
