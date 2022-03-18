@@ -1,0 +1,51 @@
+
+# Quick Start
+# $ xhost local:root
+# $ docker compose up
+
+services:
+  husarnet_rviz:
+    image: husarnet/husarnet
+    # network_mode: host
+    devices:
+      - /dev/net/tun
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0  # Husarnet is using IPv6 for the internal connections
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /var/lib/husarnet  # This will persist your Husarnet Client keys, thus IP of the container will be stable/the same between (re)boots
+    environment:
+      - HOSTNAME=rviz
+      - JOINCODE=${JOINCODE}
+
+  dds-router-rviz:
+    image: husarnet/dds-router
+    network_mode: service:husarnet_rviz
+    volumes:
+      - ./router-config.rviz.yaml:/config.yaml
+    environment:
+      - DS_HOSTNAME=ds
+    # command: sleep 3600
+    command: bash -c "wait_ds.sh && ddsrouter -c /config.yaml -r 10"
+
+  listener:
+    build: ../
+    command: ros2 run demo_nodes_cpp listener
+
+  rviz:
+    image: husarion/rviz2
+    runtime: nvidia
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
+    environment:
+      - DISPLAY
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+# Needed if running all compose.*.yaml files on the same host. Thanks to those lines a new subnet for this compose file is created
+networks:
+  default:
+    name: net_rviz
+    driver: bridge

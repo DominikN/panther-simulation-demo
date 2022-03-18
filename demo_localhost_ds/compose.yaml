@@ -1,0 +1,110 @@
+# Quick Start
+# $ xhost local:root
+# $ docker compose up
+
+services:
+
+  #################################################################
+  # 1st "device" running: 
+  # - RViz container
+  # - DDS Router (Discovery Server: client)
+  # - (optinaly) listener to test connectivity
+  #################################################################
+
+  dds-router-rviz:
+    image: husarnet/dds-router
+    depends_on:
+      - dds-router-gazebo
+    networks:
+      - rviz_net
+      - ds_net
+    volumes:
+      - ./router-config.rviz.yaml:/config.yaml
+    command: bash -c "ddsrouter -c /config.yaml -r 10"
+
+  rviz:
+    image: husarion/rviz2
+    runtime: nvidia
+    networks:
+      - rviz_net
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../rviz/panther_nav2.rviz:/root/.rviz2/default.rviz
+    environment:
+      - DISPLAY
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+  listener:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    networks:
+      - rviz_net
+    command: ros2 run demo_nodes_cpp listener
+
+  #################################################################
+  # 2nd "device" running: 
+  # - Gazebo container (launching Pather simulation)
+  # - nav2 container 
+  # - DDS Router (Discovery Server: server)
+  # - (optinaly) talker to test connectivity
+  #################################################################
+
+  dds-router-gazebo:
+    image: husarnet/dds-router
+    networks:
+      - gazebo_net
+      - ds_net
+    volumes:
+      - ./router-config.gazebo.yaml:/config.yaml
+    command: bash -c "ddsrouter -c /config.yaml -r 10"
+
+  panther-gazebo:
+    image: husarion/panther-gazebo:galactic-latest
+    runtime: nvidia
+    networks:
+      - gazebo_net
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1"
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,display
+      - ROS_DOMAIN_ID=1
+    command: >
+      ros2 launch panther_gazebo panther.launch.py 
+      use_gpu:=true
+
+  nav2:
+    image: husarion/nav2:galactic-latest
+    networks:
+      - gazebo_net
+    volumes:
+      - ../nav2_config/nav2_params.yaml:/app/ros2_ws/src/husarion_nav2/config/nav2_params.yaml
+      - ../nav2_config/slam_toolbox.yaml:/app/ros2_ws/src/husarion_nav2/config/slam_toolbox.yaml
+    environment:
+      - ROS_DOMAIN_ID=1
+    command: ros2 launch husarion_nav2 bringup_both.launch.py
+
+  talker:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    networks:
+      - gazebo_net
+    environment:
+      - ROS_DOMAIN_ID=1
+    command: ros2 run demo_nodes_cpp talker
+
+#################################################################
+# Custom networks (note that default network is disabled)
+#################################################################
+
+networks:
+  rviz_net:
+  gazebo_net:
+  ds_net:
+  default:
+    driver: none
