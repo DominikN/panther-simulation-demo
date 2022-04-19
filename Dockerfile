@@ -10,6 +10,4 @@ RUN apt-get update && apt-get install -y \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ros_entrypoint.sh /
-
-RUN chmod +x /ros_entrypoint.sh
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
